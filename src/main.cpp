@@ -31,14 +31,12 @@ class $modify(SettingsEditorPauseLayer, EditorPauseLayer) {
     }
 
     void onSettingsButton(CCObject*) {
-        openSettingsPopup(Mod::get());
+        if (auto popup = geode::openSettingsPopup(Mod::get(), true)) {
+            popup->setScale(0.65f);
+            popup->setOpacity(0);
 
-        Loader::get()->queueInMainThread([] {
-            if (auto popup = CCDirector::get()->getRunningScene()->getChildByType<geode::Popup>(0)) {
-                popup->setScale(0.65f);
-                popup->setOpacity(0);
-            }
-        }); 
+            onResume(nullptr);
+        }
     }
 };
 
