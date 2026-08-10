@@ -1,3 +1,8 @@
+# v1.0.2
+**Fixed**
+
+- object info positioning
+
 # v1.0.1
 **Fixed**
 

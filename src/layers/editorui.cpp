@@ -195,7 +195,7 @@ class $modify(UIScalingEditorUI, EditorUI) {
         if (m_objectInfoLabel) {
             Setup(m_objectInfoLabel)
                 .scale(pScale * 0.6f)
-                .pos((pVanillaPositioning ? 52.0f : 5.0f) * pScale, window.height - 50.f * pScale);
+                .pos((pVanillaPositioning ? 52.0f : 50.0f) * pScale, window.height - 50.f * pScale);
         }
 
         auto background = this->getChildByID("background-sprite");
