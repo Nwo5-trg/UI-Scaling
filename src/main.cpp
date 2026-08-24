@@ -20,9 +20,9 @@ class $modify(SettingsEditorPauseLayer, EditorPauseLayer) {
             return true;
         }
 
-        guidelinesMenu->addChild(Setup(ui::circleButtonFrame(
+        guidelinesMenu->addChild(ui::circleButtonFrame(
             "edit_areaModeBtn05_001.png", CircleBaseColor::Green, this, menu_selector(SettingsEditorPauseLayer::onSettingsButton), 0.75f
-        ))
+        )
             .scaleToFit(guidelinesMenu->getChildByID("help-button")->getScaledContentWidth())
         );
         guidelinesMenu->updateLayout();

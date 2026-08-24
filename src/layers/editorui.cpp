@@ -48,10 +48,10 @@ class $modify(UIScalingEditorUI, EditorUI) {
         if (undoMenu) {
             Setup(undoMenu)
                 .scale(pScale)
-                .anchor(CENTER_ANCHOR)
+                .anchor(Anchor::Center)
                 .pos(
-                    undoMenu->getScaledContentWidth() / 2 + leftPadding, 
-                    window.height - undoMenu->getScaledContentHeight() / 2 - topPadding
+                    ui::sw(undoMenu) / 2 + leftPadding, 
+                    window.height - ui::sh(undoMenu) / 2 - topPadding
                 );
         }
         
@@ -60,17 +60,17 @@ class $modify(UIScalingEditorUI, EditorUI) {
         if (settingsMenu) {
             Setup(settingsMenu)
                 .scale(pScale)
-                .anchor(CENTER_ANCHOR)
+                .anchor(Anchor::Center)
                 .pos(
-                    window.width - (pVanillaPositioning ? 0.0f : CUSTOM_EDGE_PADDING) * pScale - settingsMenu->getScaledContentWidth() / 2, 
-                    window.height - settingsMenu->getScaledContentHeight() / 2 - topPadding
+                    window.width - (pVanillaPositioning ? 0.0f : CUSTOM_EDGE_PADDING) * pScale - ui::sw(settingsMenu) / 2, 
+                    window.height - ui::sh(settingsMenu) / 2 - topPadding
                 );
         }
 
         if (auto slider = this->getChildByID("position-slider"); slider && undoMenu && settingsMenu) {
             Setup(slider)
                 .scale(pScale)
-                .anchor(CENTER_ANCHOR)
+                .anchor(Anchor::Center)
                 .ignoreAnchorForPos(false)
                 .size(CCSizeZero)
                 .pos(
@@ -80,7 +80,7 @@ class $modify(UIScalingEditorUI, EditorUI) {
                             window.height - 20.0f * pScale
                           )
                         : ccp(
-                            Settings::editorUICenterSlider ? window.width / 2 : (undoMenu->getPositionX() + undoMenu->getScaledContentWidth() / 2 + settingsMenu->getPositionX() - settingsMenu->getScaledContentWidth() / 2) / 2,
+                            Settings::editorUICenterSlider ? window.width / 2 : (ui::x(undoMenu) + ui::sw(undoMenu) / 2 + ui::x(settingsMenu) - ui::sw(settingsMenu) / 2) / 2,
                             window.height - 20.0f * pScale
                           )
                 );
@@ -96,23 +96,23 @@ class $modify(UIScalingEditorUI, EditorUI) {
 
             Setup(editorButtons)
                 .scale(rightMenuScale)
-                .anchor(CENTER_ANCHOR)
+                .anchor(Anchor::Center)
                 .pos(
-                    window.width - editorButtons->getScaledContentWidth() / 2,
+                    window.width - ui::sw(editorButtons) / 2,
                     centerHeight - (pVanillaPositioning ? 2.0f : 5.0f * rightMenuScale)
                 );
 
             if (auto layerMenu = this->getChildByID("layer-menu")) {
                 Setup(layerMenu)
                     .scale(rightMenuScale)
-                    .anchor(CENTER_ANCHOR)
+                    .anchor(Anchor::Center)
                     .pos(
-                        window.width - layerMenu->getScaledContentWidth() / 2 - (pVanillaPositioning ? 6.0f : CUSTOM_EDGE_PADDING) * rightMenuScale,
-                        editorButtons->getPositionY() - editorButtons->getScaledContentHeight() / 2 + (pVanillaPositioning ? 0.5f : 0.0f) * rightMenuScale
+                        window.width - ui::sw(layerMenu) / 2 - (pVanillaPositioning ? 6.0f : CUSTOM_EDGE_PADDING) * rightMenuScale,
+                        ui::y(editorButtons) - ui::sh(editorButtons) / 2 + (pVanillaPositioning ? 0.5f : 0.0f) * rightMenuScale
                     );
 
                 if (m_currentLayerLabel) {
-                    const auto labelWorldPos = m_currentLayerLabel->convertToWorldSpace(m_currentLayerLabel->getScaledContentSize() / 2);
+                    const auto labelWorldPos = m_currentLayerLabel->convertToWorldSpace(ui::ssize(m_currentLayerLabel) / 2);
 
                     if (m_layerLockSprite) {
                         Setup(m_layerLockSprite)
@@ -132,25 +132,25 @@ class $modify(UIScalingEditorUI, EditorUI) {
         if (auto playtestMenu = this->getChildByID("playtest-menu")) {
             Setup(playtestMenu)
                 .scale(pScale)
-                .anchor(CENTER_ANCHOR)
+                .anchor(Anchor::Center)
                 .pos(
-                    playtestMenu->getScaledContentWidth() / 2 + leftPadding,
+                    ui::sw(playtestMenu) / 2 + leftPadding,
                     centerHeight + (pVanillaPositioning ? 2.0f : 0.0f) * pScale
                 );
 
             if (auto playbackMenu = this->getChildByID("playback-menu")) {
                 Setup(playbackMenu)
                     .scale(pScale)
-                    .anchor(CENTER_ANCHOR)
+                    .anchor(Anchor::Center)
                     .pos(
                         pVanillaPositioning
                             ? ccp(
-                                playbackMenu->getScaledContentWidth() / 2 + leftPadding,
-                                playtestMenu->getPositionY() + 45.0f * pScale
+                                ui::sw(playbackMenu) / 2 + leftPadding,
+                                ui::y(playtestMenu) + 45.0f * pScale
                                 )
                             : ccp(
-                                playbackMenu->getScaledContentWidth() / 2 + leftPadding,
-                                playtestMenu->getPositionY() + playtestMenu->getScaledContentHeight() / 2 + CUSTOM_LEFT_GROUP_GAP * pScale + playbackMenu->getScaledContentHeight() / 2
+                                ui::sw(playbackMenu) / 2 + leftPadding,
+                                ui::y(playtestMenu) + ui::sh(playtestMenu) / 2 + CUSTOM_LEFT_GROUP_GAP * pScale + ui::sh(playbackMenu) / 2
                                 )
                     );
 
@@ -159,7 +159,7 @@ class $modify(UIScalingEditorUI, EditorUI) {
                         .scale(pScale)
                         .pos(
                             playtestMenu->boundingBox().getMinX() + 40.0f * pScale,
-                            (playtestMenu->getPositionY() + playbackMenu->getPositionY()) / 2
+                            (ui::y(playtestMenu) + ui::y(playbackMenu)) / 2
                         );
                 }
             }
@@ -167,25 +167,25 @@ class $modify(UIScalingEditorUI, EditorUI) {
             if (auto zoomMenu = this->getChildByID("zoom-menu")) {
                 Setup(zoomMenu)
                     .scale(pScale)
-                    .anchor(CENTER_ANCHOR)
+                    .anchor(Anchor::Center)
                     .pos(
-                        zoomMenu->getScaledContentWidth() / 2 + (pVanillaPositioning ? 9.8f : CUSTOM_EDGE_PADDING) * pScale,
-                        playtestMenu->getPositionY() - playtestMenu->getScaledContentHeight() / 2 - (pVanillaPositioning ? 10.0f : CUSTOM_LEFT_GROUP_GAP) * pScale - zoomMenu->getScaledContentHeight() / 2
+                        ui::sw(zoomMenu) / 2 + (pVanillaPositioning ? 9.8f : CUSTOM_EDGE_PADDING) * pScale,
+                        ui::y(playtestMenu) - ui::sh(playtestMenu) / 2 - (pVanillaPositioning ? 10.0f : CUSTOM_LEFT_GROUP_GAP) * pScale - ui::sh(zoomMenu) / 2
                     );
 
                 if (auto linkMenu = this->getChildByID("link-menu")) {
                     Setup(linkMenu)
                         .scale(pScale)
-                        .anchor(CENTER_ANCHOR)
+                        .anchor(Anchor::Center)
                         .pos(
                             pVanillaPositioning
                                 ? ccp(
-                                    zoomMenu->getPositionX() + zoomMenu->getScaledContentWidth() / 2 + linkMenu->getScaledContentWidth() / 2 + 5.0f * pScale,
-                                    playtestMenu->getPositionY() - linkMenu->getScaledContentHeight() / 2 + 4.0f * pScale
+                                    ui::x(zoomMenu) + ui::sw(zoomMenu) / 2 + ui::sw(linkMenu) / 2 + 5.0f * pScale,
+                                    ui::y(playtestMenu) - ui::sh(linkMenu) / 2 + 4.0f * pScale
                                   )
                                 : ccp (
-                                    zoomMenu->getPositionX() + zoomMenu->getScaledContentWidth() / 2 + linkMenu->getScaledContentWidth() / 2 + 10.0f * pScale,
-                                    (playtestMenu->getPositionY() + zoomMenu->getPositionY()) / 2 - linkMenu->getScaledContentHeight() / 6
+                                    ui::x(zoomMenu) + ui::sw(zoomMenu) / 2 + ui::sw(linkMenu) / 2 + 10.0f * pScale,
+                                    (ui::y(playtestMenu) + ui::y(zoomMenu)) / 2 - ui::sh(linkMenu) / 6
                                   )
                         );
                 }
@@ -205,20 +205,21 @@ class $modify(UIScalingEditorUI, EditorUI) {
                 .scaleWidthToFit(window.width)
                 .scaleY(toolbarScale)
                 .pos(CCPointZero)
-                .anchor(BOTTOM_LEFT_ANCHOR);
+                .anchor(Anchor::BottomLeft);
         }
 
         if (auto buildTabsMenu = this->getChildByID("build-tabs-menu")) {
             Setup(buildTabsMenu)
                 .scale(toolbarScale)
-                .anchor(BOTTOM_CENTER_ANCHOR)
+                .anchor(Anchor::Bottom)
                 .pos(window.width / 2, m_toolbarHeight - (pVanillaPositioning ? 1.0f : 0.0f) * pScale);
         }
 
         if (auto tabNav = this->getChildByID("alphalaneous.editortab_api/tabs-navigation-menu")) {
-            tabNav->setScale(toolbarScale);
-            tabNav->setPosition({window.width / 2.f, m_toolbarHeight - 1.f});
-            tabNav->setAnchorPoint({0.5f, 0.f});
+            Setup(tabNav)
+                .scale(toolbarScale)
+                .pos(window.width / 2.0f, m_toolbarHeight - 1.0f)
+                .anchor(Anchor::Bottom);
         }
 
         const auto toolbarPadding = 5.0f * toolbarScale;
@@ -236,25 +237,25 @@ class $modify(UIScalingEditorUI, EditorUI) {
 
             Setup(categoriesMenu)
                 .scale(toolbarScale)
-                .anchor(CENTER_ANCHOR)
-                .pos(categoriesMenu->getScaledContentSize() / 2 + ccp(padding, 0.0f));
+                .anchor(Anchor::Center)
+                .pos(ui::ssize(categoriesMenu) / 2 + ccp(padding, 0.0f));
 
             if (leftLine) {
                 Setup(leftLine)
                     .scale(toolbarScale)
-                    .anchor(CENTER_ANCHOR)
+                    .anchor(Anchor::Center)
                     .pos(
-                        categoriesMenu->getPositionX() + categoriesMenu->getScaledContentWidth() / 2 + padding,
-                        pVanillaPositioning ? 6.5f * toolbarScale + leftLine->getScaledContentHeight() / 2 : m_toolbarHeight / 2
+                        ui::x(categoriesMenu) + ui::sw(categoriesMenu) / 2 + padding,
+                        pVanillaPositioning ? 6.5f * toolbarScale + ui::sh(leftLine) / 2 : m_toolbarHeight / 2
                     );
             }
 
             if (auto gotoMenu = this->getChildByID("razoom.object_groups/goto_obj_menu")) {
                 Setup(gotoMenu)
                     .scale(toolbarScale)
-                    .anchor(BOTTOM_LEFT_ANCHOR)
+                    .anchor(Anchor::BottomLeft)
                     .pos(
-                        categoriesMenu->getPositionX() + categoriesMenu->getScaledContentWidth() / 2 + padding + 2.5f * toolbarScale,
+                        ui::x(categoriesMenu) + ui::sw(categoriesMenu) / 2 + padding + 2.5f * toolbarScale,
                         2.5f * toolbarScale
                     );
             }
@@ -263,19 +264,19 @@ class $modify(UIScalingEditorUI, EditorUI) {
         if (auto toolbarTogglesMenu = this->getChildByID("toolbar-toggles-menu")) {
             Setup(toolbarTogglesMenu)
                 .scale(toolbarScale)
-                .anchor(CENTER_ANCHOR)
+                .anchor(Anchor::Center)
                 .pos(
-                    window.width - toolbarTogglesMenu->getScaledContentWidth() / 2 - (pVanillaPositioning ? 3.0f * toolbarScale : toolbarPadding),
-                    toolbarTogglesMenu->getScaledContentHeight() / 2
+                    window.width - ui::sw(toolbarTogglesMenu) / 2 - (pVanillaPositioning ? 3.0f * toolbarScale : toolbarPadding),
+                    ui::sh(toolbarTogglesMenu) / 2
                 );
 
             if (rightLine) { 
                 Setup(rightLine)
                     .scale(toolbarScale)
-                    .anchor(CENTER_ANCHOR)
+                    .anchor(Anchor::Center)
                     .pos(
-                        toolbarTogglesMenu->getPositionX() - toolbarTogglesMenu->getScaledContentWidth() / 2 - (pVanillaPositioning ? 3.0f * toolbarScale : toolbarPadding),
-                        pVanillaPositioning ? 6.5f * toolbarScale + rightLine->getScaledContentHeight() / 2 : m_toolbarHeight / 2
+                        ui::x(toolbarTogglesMenu) - ui::sw(toolbarTogglesMenu) / 2 - (pVanillaPositioning ? 3.0f * toolbarScale : toolbarPadding),
+                        pVanillaPositioning ? 6.5f * toolbarScale + ui::sh(rightLine) / 2 : m_toolbarHeight / 2
                     );
             }
 
@@ -283,15 +284,16 @@ class $modify(UIScalingEditorUI, EditorUI) {
                 Setup(toggleMenu)
                     .scale(toolbarScale)
                     .pos(
-                        toolbarTogglesMenu->getPositionX() - toolbarTogglesMenu->getScaledContentWidth() / 2 - 5.0f * toolbarScale,
+                        ui::x(toolbarTogglesMenu) - ui::sw(toolbarTogglesMenu) / 2 - 5.0f * toolbarScale,
                         2.5f * toolbarScale
                     );
             }
         }
 
         if (auto rowMenu = this->getChildByID("razoom.object_groups/row_menu")) {
-            rowMenu->setScale(0.55f * pScale);
-            rowMenu->setPositionY(m_toolbarHeight + 20.0f * pScale);
+            Setup(rowMenu)
+                .scale(0.55f * pScale)
+                .posY(m_toolbarHeight + 20.0f * pScale);
         }
 
         if (auto moveMenu = this->getChildByID("hjfod.betteredit/custom-move-menu")) {
@@ -304,7 +306,7 @@ class $modify(UIScalingEditorUI, EditorUI) {
         if (m_deleteMenu) {
             Setup(m_deleteMenu)
                 .scale(toolbarScale)
-                .anchor(CENTER_ANCHOR)
+                .anchor(Anchor::Center)
                 .ignoreAnchorForPos(false)
                 .size(CCSizeZero)
                 .pos(window.width / 2, m_toolbarHeight / 2);
@@ -315,8 +317,8 @@ class $modify(UIScalingEditorUI, EditorUI) {
                 if (auto bar = typeinfo_cast<EditButtonBar*>(node); bar && leftLine && rightLine) {
                     Setup(bar)
                         .scale(toolbarScale)
-                        .anchor(BOTTOM_CENTER_ANCHOR)
-                        .pos((leftLine->getPositionX() + rightLine->getPositionX()) / 2, 0.0f);
+                        .anchor(Anchor::Bottom)
+                        .pos((ui::x(leftLine) + ui::x(rightLine)) / 2, 0.0f);
 
                     bar->reloadItems(
                         GameManager::get()->getIntGameVariable(GameVar::EditorButtonsPerRow),
