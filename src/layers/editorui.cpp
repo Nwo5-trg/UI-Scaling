@@ -16,7 +16,7 @@ class $modify(UIScalingEditorUI, EditorUI) {
     static constexpr auto CUSTOM_LEFT_GROUP_GAP = 5.0f;
 
     static void onModify(auto& pSelf) {
-        (void)pSelf.setHookPriorityPost("EditorUI::init", Priority::Late);
+        (void)pSelf.setHookPriorityPost("EditorUI::init", Priority::Early);
     }
     bool init(LevelEditorLayer* editorLayer) {
         if (!EditorUI::init(editorLayer)) {
