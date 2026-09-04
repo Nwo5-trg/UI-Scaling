@@ -1,6 +1,6 @@
 #include <nwo5.silly-api/include/include.hpp>
-#include <include.hpp>
 #define GEODE_DEFINE_EVENT_EXPORTS
+#include <include.hpp>
 #include "editor-ui.hpp"
 
 using namespace geode::prelude;
