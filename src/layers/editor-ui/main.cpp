@@ -8,10 +8,6 @@
 using namespace geode::prelude;
 using namespace nwo5::prelude;
 
-void UIScalingEditorUI::onModify(auto& pSelf) {
-    (void)pSelf.setHookPriorityPost("EditorUI::init", Priority::Late);
-}
-
 bool UIScalingEditorUI::init(LevelEditorLayer* editorLayer) {
     if (!EditorUI::init(editorLayer)) {
         return false;
