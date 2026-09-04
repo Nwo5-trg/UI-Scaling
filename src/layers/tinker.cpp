@@ -2,7 +2,7 @@
 #include <nwo5.silly-api/include/include.hpp>
 #include "../settings.hpp"
 #include <include.hpp>
-#include "include.hpp"
+#include "tinker.hpp"
 
 using namespace geode::prelude;
 using namespace nwo5::prelude;
