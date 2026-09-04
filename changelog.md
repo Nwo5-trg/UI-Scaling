@@ -1,9 +1,15 @@
-# v1.0.3
-- ported to new sillyapi version
+# v2.0.0
+**Added**
+
+- reworked the api to make it fully optional
 
 **Fixed**
 
-- hook prio ?
+- tinker support (verryyyyyy scuffed)
+
+**Internal**
+
+- ported to new sillyapi version
 
 # v1.0.2
 **Fixed**

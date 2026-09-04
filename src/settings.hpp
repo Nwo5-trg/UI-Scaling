@@ -5,6 +5,8 @@
 using namespace nwo5::settings::prelude;
 
 namespace Settings {
+    inline Setting<bool> useSafeArea{"use-safe-area"};
+    inline Setting<float> customSafeArea{"custom-safe-area"};
     inline Setting<bool> settingsButtonInEditor{"settings-button-in-editor"};
 
     inline Setting<bool> editorUIEnabled{"editor-ui-enabled"};

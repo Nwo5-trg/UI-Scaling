@@ -23,7 +23,7 @@ class $modify(SettingsEditorPauseLayer, EditorPauseLayer) {
         guidelinesMenu->addChild(ui::circleButtonFrame(
             "edit_areaModeBtn05_001.png", CircleBaseColor::Green, this, menu_selector(SettingsEditorPauseLayer::onSettingsButton), 0.75f
         )
-            .scaleToFit(guidelinesMenu->getChildByID("help-button")->getScaledContentWidth())
+            .scaleToFit(ui::sw(guidelinesMenu->getChildByID("help-button")))
         );
         guidelinesMenu->updateLayout();
         
@@ -32,10 +32,11 @@ class $modify(SettingsEditorPauseLayer, EditorPauseLayer) {
 
     void onSettingsButton(CCObject*) {
         if (auto popup = geode::openSettingsPopup(Mod::get(), true)) {
-            popup->setScale(0.65f);
-            popup->setOpacity(0);
+            Setup(popup)
+                .scale(0.75f)
+                .opacity(0);
 
-            onResume(nullptr);
+            this->onResume(nullptr);
         }
     }
 };

@@ -1,7 +1,5 @@
 # Editor UI Scaling
-with all the mods that add editor scaling being gone now, and a personal want for a universal api for ui scaling, this mod was born :3
-
-by default things are positioned a bit differently than vanilla ui in order to fix some inconsistencies (enable vanilla positioning in settings if you want to revert this)
+scale editor ui
 
 if ur a dev check github readme for info as to how ui scaling works
 
@@ -11,6 +9,7 @@ if ur a dev check github readme for info as to how ui scaling works
 these mods should have support out of the box
 
 - **BetterEdit** - hjfod
+- **Tinker** - alpha (some issues if u scale ui outside of the range {0.4, 1.0} but like y would u do that)
 - **Named Editor Layers** - razoom
 - **Object Groups** - razoom
 - **Start Position Viewer** - d050

@@ -8,7 +8,7 @@
 	},
 	"id": "nwo5.ui-scaling",
 	"name": "Editor UI Scaling",
-	"version": "v1.0.3",
+	"version": "v2.0.0",
 	"developer": "nwo5",
 	"description": "*scales ur ui*",
 	"tags": [
@@ -32,6 +32,18 @@
 		"general-title": {
 			"type": "title",
 			"name": "General"
+		},
+		"use-safe-area": {
+			"type": "bool",
+			"name": "Use Safe Area",
+			"default": true
+		},
+		"custom-safe-area": {
+			"type": "float",
+			"name": "Custom Safe Area",
+			"description": "set to any value other than 0 to override safe area",
+			"default": 0,
+			"enable-if": "use-safe-area"
 		},
 		"settings-button-in-editor": {
 			"type": "bool",
@@ -59,8 +71,8 @@
 		"editor-ui-vanilla-positioning": {
 			"type": "bool",
 			"name": "Vanilla Positioning",
-			"default": false,
-			"description": "by default this mod also fixes some inconsistencies in editor ui, this setting will revert that to be as consistent to the original as possible",
+			"default": true,
+			"description": "disabling this lets the mod fix some small inconsistencies in editor ui, by default the ui is as consistent to the original as possible",
 			"enable-if": "editor-ui-enabled"
 		},
 		"editor-ui-scale-toolbar": {
