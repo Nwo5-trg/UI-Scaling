@@ -1,3 +1,5 @@
+#pragma once
+
 #include <Geode/modify/EditorUI.hpp>
 
 class $modify(UIScalingEditorUI, EditorUI) {
