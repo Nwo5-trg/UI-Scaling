@@ -107,9 +107,14 @@ namespace uiscaling::tinker {
             ret.useCustomSafeArea = ret.useCustomSafeAreaSetting->getValue();
             ret.useCustomSafeAreaSetting->setValue(pCustomSafeArea.has_value());
         }
-        if ((ret.customSafeAreaSetting = std::static_pointer_cast<FloatSettingV3>(tinker->getSetting("UIScaling-custom-safe-area"))) && pCustomSafeArea.has_value()) {
-            ret.customSafeArea = ret.customSafeAreaSetting->getValue();
-            ret.customSafeAreaSetting->setValue(pCustomSafeArea.value());
+        if ((ret.customSafeAreaSetting = std::static_pointer_cast<FloatSettingV3>(tinker->getSetting("UIScaling-custom-safe-area")))) {
+            if (pCustomSafeArea.has_value()) {
+                ret.customSafeArea = ret.customSafeAreaSetting->getValue();
+                ret.customSafeAreaSetting->setValue(pCustomSafeArea.value());
+            }
+            else {
+                ret.customSafeAreaSetting = nullptr;
+            }
         }
         if ((ret.scaleSetting = std::static_pointer_cast<FloatSettingV3>(tinker->getSetting("UIScaling-scale")))) {
             ret.scale = ret.scaleSetting->getValue();
