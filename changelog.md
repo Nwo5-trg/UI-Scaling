@@ -1,3 +1,8 @@
+# v2.0.1
+**Fixed**
+
+- crash
+
 # v2.0.0
 **Added**
 
