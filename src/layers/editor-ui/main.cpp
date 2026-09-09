@@ -8,16 +8,17 @@
 using namespace geode::prelude;
 using namespace nwo5::prelude;
 
+// add some kind of setting to prioritize tinker scaling
 bool UIScalingEditorUI::init(LevelEditorLayer* editorLayer) {
     if (!EditorUI::init(editorLayer)) {
         return false;
     }
 
     addOnEnterCallback([this] {
-        if (Settings::editorUIEnabled) {
+        if (Settings::editorUIEnabled && (!Settings::preferTinkerScaling || !uiscaling::tinker::get())) {
             this->updateUIScale(
-                Settings::editorUIScaling, Settings::editorUIVanillaPositioning, Settings::editorUIScaleToolbar,
-                Settings::useSafeArea, Settings::customSafeArea ? std::optional<float>{Settings::customSafeArea} : std::nullopt
+                Settings::editorUIScaling, Settings::editorUIVanillaPositioning, Settings::editorUIScaleToolbar, Settings::useSafeArea,
+                Settings::customSafeArea ? std::optional<float>{Settings::customSafeArea} : std::nullopt
             );
         }
         else {
@@ -71,7 +72,7 @@ void UIScalingEditorUI::updateUIScale(float pScale, bool pVanillaPositioning, bo
             .scale(pScale)
             .anchor(Anchor::Center)
             .ignoreAnchorForPos(false)
-            .size(CCSizeZero)
+            .size(213.0f, 36.0f)
             .pos(
                 pVanillaPositioning
                     ? CCPoint{
@@ -83,11 +84,14 @@ void UIScalingEditorUI::updateUIScale(float pScale, bool pVanillaPositioning, bo
                         window.height - 20.0f * pScale
                     }
             );
+        
+        slider->m_touchLogic->setPosition(ui::size(slider) / 2);
+        slider->m_groove->setPosition(ui::size(slider) / 2);
 
         if (auto gridControls = this->getChildByID("hjfod.betteredit/grid-size-controls")) {
             const auto gridControlsScale = std::min(pScale, 0.85f) * 0.9f;
             
-            const auto min = ui::x(slider) + ui::w(slider->m_sliderBar) / 2 * pScale;
+            const auto min = ui::x(slider) + ui::w(slider) / 2 * pScale;
             const auto max = ui::x(settingsMenu) - ui::sw(settingsMenu) / 2;
             const auto fitInbetween = max - min <= ui::w(gridControls) * gridControlsScale;
 
@@ -101,7 +105,7 @@ void UIScalingEditorUI::updateUIScale(float pScale, bool pVanillaPositioning, bo
                             max - 6.0f, ui::y(settingsMenu)
                         }
                         : CCPoint{
-                            ui::pos(slider) - CCPoint{0.0f, ui::h(slider->m_sliderBar) / 2 * pScale - ui::sh(gridControls) / 2 }
+                            ui::pos(slider) - CCPoint{0.0f, ui::h(slider) / 2 * pScale - ui::sh(gridControls) / 2 }
                         }
                 );
         }
@@ -114,8 +118,7 @@ void UIScalingEditorUI::updateUIScale(float pScale, bool pVanillaPositioning, bo
     // i should js get the node honestly remind me to change this ig
     const auto toolbarOffset = (
         uiscaling::tinker::get() 
-        && uiscaling::tinker::get()->getSettingValue<bool>("StatusBar-enabled") 
-        && uiscaling::tinker::get()->getSettingValue<bool>("UIScaling-enabled") 
+        && uiscaling::tinker::get()->getSettingValue<bool>("StatusBar-enabled")
         && pScale <= 0.9f
     )
         ? 8.0f 
@@ -383,6 +386,21 @@ $execute {
             );
         }
     });
+    listenForSettingChanges<bool>("prefer-tinker-scaling", [] (bool pEnabled) {
+        if (!uiscaling::tinker::get()) {
+            return;
+        }
+
+        if (pEnabled) {
+            uiscaling::tinker::updateSettings();
+        }
+        else {
+            nwo5::uiscaling::EditorUI::setScale(
+                Settings::editorUIScaling, Settings::editorUIVanillaPositioning, Settings::editorUIScaleToolbar,
+                Settings::useSafeArea, Settings::customSafeArea ? std::optional<float>{Settings::customSafeArea} : std::nullopt
+            );
+        }
+    });
 
     listenForSettingChanges<bool>("editor-ui-enabled", [] (bool pEnabled) {
         if (pEnabled) {
@@ -392,9 +410,10 @@ $execute {
             );
         }
         else {
-            uiscaling::tinker::updateSettings();
-
-            if (!uiscaling::tinker::scalingEnabled()) {
+            if (uiscaling::tinker::get()) {
+                uiscaling::tinker::updateSettings();
+            }
+            else {
                 nwo5::uiscaling::EditorUI::setScale(
                     1.0f, Settings::editorUIVanillaPositioning, Settings::editorUIScaleToolbar,
                     Settings::useSafeArea, Settings::customSafeArea ? std::optional<float>{Settings::customSafeArea} : std::nullopt
@@ -435,3 +454,4 @@ $execute {
         }
     });
 }
+/// listener for the tinker prefer toggle thing

@@ -1,3 +1,11 @@
+# v2.1.0
+**Added**
+
+- made api allow for getting ui scale of all mods
+- optimized some tinker stuffs
+- prefer tinker toggle
+- docs
+
 # v2.0.1
 **Fixed**
 

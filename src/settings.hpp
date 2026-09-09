@@ -8,7 +8,8 @@ namespace Settings {
     inline Setting<bool> useSafeArea{"use-safe-area"};
     inline Setting<float> customSafeArea{"custom-safe-area"};
     inline Setting<bool> settingsButtonInEditor{"settings-button-in-editor"};
-
+    inline Setting<bool> preferTinkerScaling{"prefer-tinker-scaling"};
+    
     inline Setting<bool> editorUIEnabled{"editor-ui-enabled"};
     inline Setting<float> editorUIScaling{"editor-ui-scaling"};
     inline Setting<bool> editorUIVanillaPositioning{"editor-ui-vanilla-positioning"};

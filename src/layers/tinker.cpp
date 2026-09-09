@@ -11,6 +11,43 @@ struct UIScaleUpdated final : Event<UIScaleUpdated, bool(float, bool, bool)> {
     using Event::Event;
 };
 
+namespace {
+    template<typename T>
+    requires std::same_as<bool, T> || std::same_as<float, T>
+    struct TinkerSetting {
+        std::shared_ptr<typename SettingTypeForValueType<T>::SettingType> setting = nullptr;
+        T value = T{};
+        T realValue = T{};
+        bool dirty = false;
+
+        void set(T pVal) {
+            setting->setValue(pVal);
+            realValue = setting->getValue();
+            value = pVal;
+            dirty = true;
+        }
+    };
+
+    auto& tinkerState() {
+        static struct {
+            TinkerSetting<bool> safeAreaEnabled;
+            TinkerSetting<bool> useCustomSafeArea;
+            TinkerSetting<float> customSafeArea;
+            TinkerSetting<float> scale;
+            TinkerSetting<bool> scaleToolbar;
+
+            void reset() {
+                safeAreaEnabled.value = safeAreaEnabled.realValue;
+                useCustomSafeArea.value = useCustomSafeArea.realValue;
+                customSafeArea.value = customSafeArea.realValue;
+                scale.value = scale.realValue;
+                scaleToolbar.value = scaleToolbar.realValue;
+            }
+        } val;
+        return val;
+    }
+}
+
 class $modify(TinkerCompatEditorUI, EditorUI) {
     struct Fields {
         bool listenToTinker = Settings::editorUIEnabled;
@@ -31,7 +68,7 @@ class $modify(TinkerCompatEditorUI, EditorUI) {
                     return ListenerResult::Propagate;
                 }
 
-                if (this->m_fields->listenToTinker) {
+                if (this->m_fields->listenToTinker && !Settings::preferTinkerScaling) {
                     nwo5::uiscaling::EditorUI::setScale(
                         pScale, true, pScaleToolbar, tinker->getSettingValue<bool>("UIScaling-use-safe-area"),
                         tinker->getSettingValue<bool>("UIScaling-use-custom-safe-area") 
@@ -70,9 +107,6 @@ namespace uiscaling::tinker {
     Mod* get() {
         return Loader::get()->getLoadedMod("alphalaneous.tinker");
     }
-    bool scalingEnabled() {
-        return get() && get()->getSettingValue<bool>("UIScaling-enabled");
-    }
     void updateUI(float pScale, bool pScaleToolbar, bool pUseSafeArea, std::optional<float> pCustomSafeArea) {
         auto ui = editor::ui<TinkerCompatEditorUI>();
         auto tinker = get();
@@ -82,86 +116,88 @@ namespace uiscaling::tinker {
         }
 
         auto fields = ui->m_fields.self();
-
-        struct {
-            std::shared_ptr<BoolSettingV3> safeAreaEnabledSetting = nullptr;
-            bool safeAreaEnabled = true;
-            std::shared_ptr<BoolSettingV3> useCustomSafeAreaSetting = nullptr;
-            bool useCustomSafeArea = false;
-            std::shared_ptr<FloatSettingV3> customSafeAreaSetting = nullptr;
-            float customSafeArea = 24.0f;
-            std::shared_ptr<FloatSettingV3> scaleSetting = nullptr;
-            float scale = 1.0f;
-            std::shared_ptr<BoolSettingV3> scaleToolbarSetting = nullptr;
-            bool scaleToolbar = true;
-        } ret;
+        auto& state = tinkerState();
 
         fields->listenToTinker = false;
 
-        // scales ui 5 times lolll, whenever i add pause scaling ill make a "tinker state" thing that keeps track of this so i only need to change whats dirty but for now this is fine
-        if ((ret.safeAreaEnabledSetting = std::static_pointer_cast<BoolSettingV3>(tinker->getSetting("UIScaling-use-safe-area")))) {
-            ret.safeAreaEnabled = ret.safeAreaEnabledSetting->getValue();
-            ret.safeAreaEnabledSetting->setValue(pUseSafeArea);
-        }
-        if ((ret.useCustomSafeAreaSetting = std::static_pointer_cast<BoolSettingV3>(tinker->getSetting("UIScaling-use-custom-safe-area")))) {
-            ret.useCustomSafeArea = ret.useCustomSafeAreaSetting->getValue();
-            ret.useCustomSafeAreaSetting->setValue(pCustomSafeArea.has_value());
-        }
-        if ((ret.customSafeAreaSetting = std::static_pointer_cast<FloatSettingV3>(tinker->getSetting("UIScaling-custom-safe-area")))) {
-            if (pCustomSafeArea.has_value()) {
-                ret.customSafeArea = ret.customSafeAreaSetting->getValue();
-                ret.customSafeAreaSetting->setValue(pCustomSafeArea.value());
+        if (auto& setting = state.safeAreaEnabled.setting; !setting || state.safeAreaEnabled.value != pUseSafeArea) {
+            if (!setting) {
+                setting = std::static_pointer_cast<BoolSettingV3>(tinker->getSetting("UIScaling-use-safe-area"));
             }
-            else {
-                ret.customSafeAreaSetting = nullptr;
+        
+            state.safeAreaEnabled.set(pUseSafeArea);
+        }
+        if (auto& setting = state.useCustomSafeArea.setting; !setting || state.useCustomSafeArea.value != pCustomSafeArea.has_value()) {
+            if (!setting) {
+                setting = std::static_pointer_cast<BoolSettingV3>(tinker->getSetting("UIScaling-use-custom-safe-area"));
             }
+        
+            state.useCustomSafeArea.set(pCustomSafeArea.has_value());
         }
-        if ((ret.scaleSetting = std::static_pointer_cast<FloatSettingV3>(tinker->getSetting("UIScaling-scale")))) {
-            ret.scale = ret.scaleSetting->getValue();
-            ret.scaleSetting->setValue(pScale);
+        if (auto& setting = state.customSafeArea.setting; !setting || (pCustomSafeArea.has_value() && state.customSafeArea.value != pCustomSafeArea.value())) {
+            if (!setting) {
+                setting = std::static_pointer_cast<FloatSettingV3>(tinker->getSetting("UIScaling-custom-safe-area"));
+            }
+        
+            state.customSafeArea.set(pCustomSafeArea.value());
         }
-        if ((ret.scaleToolbarSetting = std::static_pointer_cast<BoolSettingV3>(tinker->getSetting("UIScaling-scale-toolbar")))) {
-            ret.scaleToolbar = ret.scaleToolbarSetting->getValue();
-            ret.scaleToolbarSetting->setValue(pScaleToolbar);
+        if (auto& setting = state.scale.setting; !setting || state.scale.value != pScale) {
+            if (!setting) {
+                setting = std::static_pointer_cast<FloatSettingV3>(tinker->getSetting("UIScaling-scale"));
+            }
+        
+            state.scale.set(pScale);
+        }
+        if (auto& setting = state.scaleToolbar.setting; !setting || state.scaleToolbar.value != pScaleToolbar) {
+            if (!setting) {
+                setting = std::static_pointer_cast<BoolSettingV3>(tinker->getSetting("UIScaling-scale-toolbar"));
+            }
+        
+            state.scaleToolbar.set(pScaleToolbar);
         }
 
         fields->listenToTinker = Settings::editorUIEnabled;
 
         fields->updateTinkerSettings = false;
 
-        if (ret.safeAreaEnabledSetting) {
-            ret.safeAreaEnabledSetting->setValue(ret.safeAreaEnabled);
+        if (state.safeAreaEnabled.dirty) {
+            state.safeAreaEnabled.setting->setValue(state.safeAreaEnabled.realValue);
         }
-        if (ret.useCustomSafeAreaSetting) {
-            ret.useCustomSafeAreaSetting->setValue(ret.useCustomSafeArea);
+        if (state.useCustomSafeArea.dirty) {
+            state.useCustomSafeArea.setting->setValue(state.useCustomSafeArea.realValue);
         }
-        if (ret.customSafeAreaSetting) {
-            ret.customSafeAreaSetting->setValue(ret.customSafeArea);
+        if (state.customSafeArea.dirty) {
+            state.customSafeArea.setting->setValue(state.customSafeArea.realValue);
         }
-        if (ret.scaleSetting) {
-            ret.scaleSetting->setValue(ret.scale);
+        if (state.scale.dirty) {
+            state.scale.setting->setValue(state.scale.realValue);
         }
-        if (ret.scaleToolbarSetting) {
-            ret.scaleToolbarSetting->setValue(ret.scaleToolbar);
+        if (state.scaleToolbar.dirty) {
+            state.scaleToolbar.setting->setValue(state.scaleToolbar.realValue);
         }
 
         fields->updateTinkerSettings = true;
     }
     void updateSettings() {
         if (auto tinker = get()) {
-            if (auto setting = std::static_pointer_cast<BoolSettingV3>(tinker->getSetting("UIScaling-use-safe-area"))) {
+            auto& state = tinkerState();
+            state.reset();
+            
+            if (auto setting = state.safeAreaEnabled.setting; setting && state.safeAreaEnabled.value != state.safeAreaEnabled.realValue) {
                 setting->setValue(setting->getValue());
             }
-            if (auto setting = std::static_pointer_cast<BoolSettingV3>(tinker->getSetting("UIScaling-use-custom-safe-area"))) {
+            if (auto setting = state.useCustomSafeArea.setting; setting && state.useCustomSafeArea.value != state.useCustomSafeArea.realValue) {
                 setting->setValue(setting->getValue());
             }
-            if (auto setting = std::static_pointer_cast<FloatSettingV3>(tinker->getSetting("UIScaling-custom-safe-area"))) {
+            if (auto setting = state.customSafeArea.setting; setting && state.customSafeArea.value != state.customSafeArea.realValue) {
                 setting->setValue(setting->getValue());
             }
-            if (auto setting = std::static_pointer_cast<FloatSettingV3>(tinker->getSetting("UIScaling-scale"))) {
+            if (auto setting = state.scaleToolbar.setting; setting && state.scaleToolbar.value != state.scaleToolbar.realValue) {
                 setting->setValue(setting->getValue());
             }
-            if (auto setting = std::static_pointer_cast<FloatSettingV3>(tinker->getSetting("UIScaling-scale-toolbar"))) {
+
+            // update once even if nothing is dirty so prefer tinker positioning can update properly
+            if (auto setting = state.scale.setting; setting) {
                 setting->setValue(setting->getValue());
             }
         }
