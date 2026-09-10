@@ -65,8 +65,6 @@ class $modify(TinkerCompatEditorUI, EditorUI) {
         // *steals ur event*
         if (auto tinker = uiscaling::tinker::get()) {
             this->addEventListener(UIScaleUpdated(), [this, tinker] (float pScale, bool pScaleToolbar, bool) {
-                auto tinker = uiscaling::tinker::get();
-
                 if (!tinker) {
                     return ListenerResult::Propagate;
                 }
@@ -137,7 +135,7 @@ namespace uiscaling::tinker {
         
             state.useCustomSafeArea.set(pCustomSafeArea.has_value());
         }
-        if (auto& setting = state.customSafeArea.setting; !setting || (pCustomSafeArea.has_value() && state.customSafeArea.value != pCustomSafeArea.value())) {
+        if (auto& setting = state.customSafeArea.setting; pCustomSafeArea.has_value() && (!setting || state.customSafeArea.value != pCustomSafeArea.value())) {
             if (!setting) {
                 setting = std::static_pointer_cast<FloatSettingV3>(tinker->getSetting("UIScaling-custom-safe-area"));
             }
@@ -164,19 +162,19 @@ namespace uiscaling::tinker {
         fields->updateTinkerSettings = false;
 
         if (state.safeAreaEnabled.dirty) {
-            state.safeAreaEnabled.setting->setValue(state.safeAreaEnabled.realValue);
+            state.safeAreaEnabled.restore();
         }
         if (state.useCustomSafeArea.dirty) {
-            state.useCustomSafeArea.setting->setValue(state.useCustomSafeArea.realValue);
+            state.useCustomSafeArea.restore();
         }
         if (state.customSafeArea.dirty) {
-            state.customSafeArea.setting->setValue(state.customSafeArea.realValue);
+            state.customSafeArea.restore();
         }
         if (state.scale.dirty) {
-            state.scale.setting->setValue(state.scale.realValue);
+            state.scale.restore();
         }
         if (state.scaleToolbar.dirty) {
-            state.scaleToolbar.setting->setValue(state.scaleToolbar.realValue);
+            state.scaleToolbar.restore();
         }
 
         fields->updateTinkerSettings = true;
