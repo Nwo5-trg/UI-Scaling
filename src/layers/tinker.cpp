@@ -21,10 +21,21 @@ namespace {
         bool dirty = false;
 
         void set(T pVal) {
-            setting->setValue(pVal);
             realValue = setting->getValue();
+            setting->setValue(pVal);
             value = pVal;
             dirty = true;
+        }
+        bool unsynced() {
+            return value != realValue;
+        }
+        void sync() {
+           value = realValue;
+           setting->setValue(setting->getValue()); 
+        }
+        void restore() {
+            setting->setValue(realValue);
+            dirty = false;
         }
     };
 
@@ -35,14 +46,6 @@ namespace {
             TinkerSetting<float> customSafeArea;
             TinkerSetting<float> scale;
             TinkerSetting<bool> scaleToolbar;
-
-            void reset() {
-                safeAreaEnabled.value = safeAreaEnabled.realValue;
-                useCustomSafeArea.value = useCustomSafeArea.realValue;
-                customSafeArea.value = customSafeArea.realValue;
-                scale.value = scale.realValue;
-                scaleToolbar.value = scaleToolbar.realValue;
-            }
         } val;
         return val;
     }
@@ -181,24 +184,23 @@ namespace uiscaling::tinker {
     void updateSettings() {
         if (auto tinker = get()) {
             auto& state = tinkerState();
-            state.reset();
             
-            if (auto setting = state.safeAreaEnabled.setting; setting && state.safeAreaEnabled.value != state.safeAreaEnabled.realValue) {
-                setting->setValue(setting->getValue());
+            if (state.safeAreaEnabled.setting && state.safeAreaEnabled.unsynced()) {
+                state.safeAreaEnabled.sync();
             }
-            if (auto setting = state.useCustomSafeArea.setting; setting && state.useCustomSafeArea.value != state.useCustomSafeArea.realValue) {
-                setting->setValue(setting->getValue());
+            if (state.useCustomSafeArea.setting && state.useCustomSafeArea.unsynced()) {
+                state.useCustomSafeArea.sync();
             }
-            if (auto setting = state.customSafeArea.setting; setting && state.customSafeArea.value != state.customSafeArea.realValue) {
-                setting->setValue(setting->getValue());
+            if (state.customSafeArea.setting && state.customSafeArea.unsynced()) {
+                state.customSafeArea.sync();
             }
-            if (auto setting = state.scaleToolbar.setting; setting && state.scaleToolbar.value != state.scaleToolbar.realValue) {
-                setting->setValue(setting->getValue());
+            if (state.scaleToolbar.setting && state.scaleToolbar.unsynced()) {
+                state.scaleToolbar.sync();
             }
 
             // update once even if nothing is dirty so prefer tinker positioning can update properly
-            if (auto setting = state.scale.setting; setting) {
-                setting->setValue(setting->getValue());
+            if (state.scale.setting) {
+                state.scale.sync();
             }
         }
     }
