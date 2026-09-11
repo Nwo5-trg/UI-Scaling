@@ -208,6 +208,11 @@ void UIScalingEditorUI::updateUIScale(float pScale, bool pVanillaPositioning, bo
                 );
 
             if (auto linkMenu = this->getChildByID("link-menu")) {
+                if (auto layout = typeinfo_cast<SimpleAxisLayout*>(linkMenu->getLayout())) {
+                    layout->setAxis(Axis::Column);
+                    linkMenu->updateLayout();
+                }
+                
                 Setup(linkMenu)
                     .scale(pScale)
                     .anchor(Anchor::Center)
