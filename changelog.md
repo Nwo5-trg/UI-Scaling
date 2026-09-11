@@ -1,7 +1,7 @@
 # v2.1.2
 **Fixed**
 
-- node ids fucks up link controls so
+- obj collab fucks up link controls so
 
 # v2.1.1
 **Fixed**
