@@ -63,6 +63,9 @@ class $modify(TinkerCompatEditorUI, EditorUI) {
 
         auto& state = tinkerState();
 
+        state.listenToTinker = Settings::editorUIEnabled;
+        state.updateTinkerSettings = true;
+
         // *steals ur event*
         if (auto tinker = uiscaling::tinker::get()) {
             this->addEventListener(UIScaleUpdated(), [this, tinker] (float pScale, bool pScaleToolbar, bool) {
